@@ -1,0 +1,1439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zippy & The Edge of Everything</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --gold: #F0C060;
+  --amber: #E8901A;
+  --rose: #E85A7A;
+  --plum: #6A2A5A;
+  --teal: #1A5A6A;
+  --navy: #0A1428;
+  --cream: #FDF6E8;
+  --rust: #C44A20;
+  --sage: #4A7A5A;
+  --lavender: #9A7ABA;
+}
+
+body {
+  min-height: 100vh;
+  background: #08090E;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 24px 12px 40px;
+  font-family: 'Cormorant Garamond', serif;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Animated starfield background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,0.9) 1px, transparent 1px),
+    radial-gradient(circle, rgba(255,220,150,0.7) 1px, transparent 1px),
+    radial-gradient(circle, rgba(255,255,255,0.6) 1px, transparent 1px),
+    radial-gradient(circle, rgba(200,200,255,0.8) 1px, transparent 1px);
+  background-size: 300px 200px, 200px 300px, 250px 250px, 350px 200px;
+  background-position: 0 0, 100px 50px, 50px 150px, 200px 100px;
+  pointer-events: none;
+  z-index: 0;
+  animation: starDrift 80s linear infinite;
+}
+
+@keyframes starDrift {
+  from { background-position: 0 0, 100px 50px, 50px 150px, 200px 100px; }
+  to   { background-position: 300px 200px, 400px 350px, 350px 350px, 550px 300px; }
+}
+
+/* Birthday confetti top */
+.confetti-strip {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 6px;
+  background: repeating-linear-gradient(90deg,
+    #E85A7A 0px, #E85A7A 20px,
+    #F0C060 20px, #F0C060 40px,
+    #6A9ADA 40px, #6A9ADA 60px,
+    #7ACA7A 60px, #7ACA7A 80px,
+    #E8901A 80px, #E8901A 100px
+  );
+  z-index: 100;
+}
+
+/* ─── BOOK WRAPPER ─── */
+.book-wrap {
+  position: relative;
+  z-index: 1;
+  width: min(860px, 98vw);
+}
+
+/* ─── HEADER ─── */
+.book-header {
+  text-align: center;
+  margin-bottom: 28px;
+  animation: fadeSlideDown 1s ease both;
+}
+
+.birthday-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, rgba(240,192,96,0.15), rgba(232,90,122,0.15));
+  border: 1px solid rgba(240,192,96,0.4);
+  border-radius: 100px;
+  padding: 6px 18px;
+  margin-bottom: 14px;
+  font-size: 0.75rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+}
+
+.main-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.2rem, 7vw, 4rem);
+  font-weight: 900;
+  line-height: 1.05;
+  color: #FDF6E8;
+}
+
+.main-title em {
+  font-style: italic;
+  color: var(--gold);
+  position: relative;
+}
+
+.main-title em::after {
+  content: '';
+  position: absolute;
+  bottom: 2px; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--rose), transparent);
+  border-radius: 2px;
+}
+
+.subtitle-tag {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 1.05rem;
+  color: rgba(253,246,232,0.5);
+  margin-top: 8px;
+}
+
+/* ─── BOOK FRAME ─── */
+.book-frame {
+  background: #1A1008;
+  border-radius: 6px 20px 20px 6px;
+  box-shadow:
+    -12px 4px 30px rgba(0,0,0,0.8),
+    0 30px 80px rgba(0,0,0,0.7),
+    0 0 0 1px rgba(240,192,96,0.1),
+    inset 0 0 60px rgba(0,0,0,0.3);
+  overflow: hidden;
+  position: relative;
+}
+
+/* Spine */
+.book-spine-bar {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 32px;
+  background: linear-gradient(to right, #3A2A14, #6A4A24, #8A6A3A, #6A4A24, #3A2A14);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.book-spine-bar::after {
+  content: 'ZIPPY';
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: 'Playfair Display', serif;
+  font-size: 0.6rem;
+  letter-spacing: 3px;
+  color: rgba(240,192,96,0.6);
+}
+
+/* ─── PAGES ─── */
+.page {
+  display: none;
+  margin-left: 32px;
+  min-height: 560px;
+  animation: pageFlip 0.55s cubic-bezier(0.4,0,0.2,1) both;
+}
+
+.page.active { display: block; }
+
+@keyframes pageFlip {
+  from { opacity: 0; transform: perspective(1000px) rotateY(-8deg) scale(0.96); }
+  to   { opacity: 1; transform: perspective(1000px) rotateY(0deg) scale(1); }
+}
+
+.page-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 560px;
+}
+
+@media(max-width:600px) {
+  .page-grid { grid-template-columns: 1fr; }
+}
+
+/* ─── TEXT SIDE ─── */
+.text-side {
+  background: var(--cream);
+  padding: 52px 40px 44px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.text-side::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--plum), var(--rose), var(--amber), var(--gold));
+}
+
+.chapter-tag {
+  font-size: 0.68rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--rose);
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  margin-bottom: 10px;
+  opacity: 0.85;
+}
+
+.page-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.35rem, 2.5vw, 1.9rem);
+  font-weight: 700;
+  color: #1A0A08;
+  line-height: 1.18;
+  margin-bottom: 22px;
+}
+
+.page-body {
+  font-size: 1rem;
+  line-height: 1.95;
+  color: #3A2018;
+}
+
+.page-body p + p { margin-top: 13px; }
+
+.pull-quote {
+  margin: 20px -8px;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, rgba(232,90,122,0.06), rgba(240,192,96,0.08));
+  border-left: 3px solid var(--rose);
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 1.08rem;
+  line-height: 1.55;
+  color: var(--plum);
+  border-radius: 0 6px 6px 0;
+}
+
+.page-footer {
+  position: absolute;
+  bottom: 16px;
+  left: 40px; right: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.footer-ornament {
+  font-size: 0.9rem;
+  color: rgba(106,42,90,0.35);
+  letter-spacing: 4px;
+}
+
+.page-num {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 0.78rem;
+  color: rgba(106,42,90,0.5);
+}
+
+/* ─── ILLUSTRATIONS ─── */
+.art-side {
+  position: relative;
+  overflow: hidden;
+  min-height: 320px;
+}
+
+/* ══════════════════════════════════
+   ART 1 — Cover: Cliff at Twilight
+══════════════════════════════════ */
+.art-cover {
+  background: linear-gradient(170deg,
+    #05020F 0%,
+    #12083A 15%,
+    #2A1060 28%,
+    #6A2A7A 42%,
+    #C24A4A 56%,
+    #E87830 70%,
+    #F5B858 82%,
+    #FDD88A 92%,
+    #FEF0C0 100%
+  );
+}
+
+.art-cover .big-moon {
+  position: absolute;
+  top: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90px; height: 90px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 38%, #FFFDE0, #F8D86A, #E8B840);
+  box-shadow:
+    0 0 0 8px rgba(248,216,106,0.15),
+    0 0 0 20px rgba(248,216,106,0.08),
+    0 0 60px rgba(248,216,106,0.5),
+    0 0 120px rgba(248,216,106,0.2);
+  animation: moonPulse 4s ease-in-out infinite alternate;
+}
+
+@keyframes moonPulse {
+  from { box-shadow: 0 0 0 8px rgba(248,216,106,0.12), 0 0 50px rgba(248,216,106,0.4); }
+  to   { box-shadow: 0 0 0 16px rgba(248,216,106,0.2), 0 0 90px rgba(248,216,106,0.6); }
+}
+
+/* Stars scattered */
+.cover-star {
+  position: absolute;
+  border-radius: 50%;
+  background: white;
+  animation: twinkleS 3s ease-in-out infinite alternate;
+}
+@keyframes twinkleS {
+  from { opacity: 0.25; transform: scale(0.7); }
+  to   { opacity: 1;    transform: scale(1.3); }
+}
+
+/* Cliff layers */
+.cliff-layer {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+}
+
+.cliff-far {
+  height: 55%;
+  background: #16100A;
+  clip-path: polygon(0 55%, 10% 30%, 22% 50%, 35% 20%, 48% 40%, 60% 12%, 72% 35%, 85% 18%, 95% 32%, 100% 22%, 100% 100%, 0 100%);
+}
+
+.cliff-near {
+  height: 45%;
+  background: #0E0A06;
+  clip-path: polygon(0 65%, 12% 38%, 25% 55%, 40% 25%, 52% 48%, 65% 22%, 78% 42%, 90% 28%, 100% 38%, 100% 100%, 0 100%);
+}
+
+.sea-strip {
+  height: 18%;
+  background: linear-gradient(to bottom, #0A2A3A, #051520);
+  border-top: 1px solid rgba(80,160,200,0.3);
+}
+
+/* ── ZIPPY CSS CHARACTER (cover) ── */
+.zippy {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.zippy .z-hair {
+  width: 32px; height: 22px;
+  background: radial-gradient(ellipse at 50% 80%, #0A0402, #1A0802);
+  border-radius: 50% 50% 0 0;
+  position: relative;
+  z-index: 3;
+}
+
+/* Afro puffs */
+.zippy .z-hair::before {
+  content: '';
+  position: absolute;
+  top: -10px; left: -8px;
+  width: 48px; height: 28px;
+  background: radial-gradient(ellipse, #0E0604, #1A0C06);
+  border-radius: 50%;
+  box-shadow: inset -4px -6px 10px rgba(0,0,0,0.5);
+}
+
+/* Hair puffs detail */
+.zippy .z-hair::after {
+  content: '';
+  position: absolute;
+  top: -6px; left: -4px;
+  width: 40px; height: 20px;
+  background: transparent;
+  border-radius: 50%;
+  box-shadow:
+    -6px -4px 0 5px #0A0402,
+    6px -6px 0 6px #0A0402,
+    0px -8px 0 4px #120806;
+}
+
+.zippy .z-face {
+  width: 26px; height: 28px;
+  background: radial-gradient(ellipse at 50% 40%, #6A3010, #3D1808);
+  border-radius: 40% 40% 50% 50%;
+  margin-top: -8px;
+  position: relative;
+  z-index: 4;
+}
+
+.zippy .z-neck {
+  width: 10px; height: 8px;
+  background: #3D1808;
+  z-index: 3;
+}
+
+.zippy .z-body {
+  width: 24px; height: 32px;
+  border-radius: 3px 3px 0 0;
+  position: relative;
+  z-index: 3;
+}
+
+.zippy .z-skirt {
+  width: 0; height: 0;
+  border-left: solid transparent;
+  border-right: solid transparent;
+  border-top: solid;
+  position: relative;
+  z-index: 3;
+}
+
+/* Wind effect on hair */
+.zippy.wind .z-hair::before {
+  transform: translateX(4px) rotate(3deg);
+  transition: transform 2s ease-in-out;
+  animation: windHair 4s ease-in-out infinite alternate;
+}
+
+@keyframes windHair {
+  from { transform: translateX(0) rotate(0deg); }
+  to   { transform: translateX(5px) rotate(4deg); }
+}
+
+/* Arms */
+.zippy .z-arms {
+  position: absolute;
+  width: 60px;
+  height: 8px;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: space-between;
+}
+
+.z-arm {
+  width: 18px; height: 7px;
+  border-radius: 4px;
+  background: #3D1808;
+}
+
+/* ══════════════════════════════════
+   ART 2 — Stormy Sea
+══════════════════════════════════ */
+.art-sea {
+  background: linear-gradient(180deg,
+    #040810 0%,
+    #060F20 20%,
+    #0A1C38 45%,
+    #0E2848 65%,
+    #122A50 80%,
+    #0A1C38 100%
+  );
+  overflow: hidden;
+}
+
+.sea-wave {
+  position: absolute;
+  left: -15%; right: -15%;
+  border-radius: 50%;
+  animation: waveRoll 5s ease-in-out infinite;
+}
+
+@keyframes waveRoll {
+  0%,100% { transform: translateX(0) scaleY(1); }
+  50%      { transform: translateX(6%) scaleY(1.2); }
+}
+
+.sea-sparkle {
+  position: absolute;
+  width: 2px; height: 2px;
+  background: rgba(180,230,255,0.8);
+  border-radius: 50%;
+  animation: sparkleWave 3s ease-in-out infinite alternate;
+}
+
+@keyframes sparkleWave {
+  from { opacity: 0.2; transform: scale(0.5); }
+  to   { opacity: 0.9; transform: scale(1.5); }
+}
+
+.art-sea .cliff-right {
+  position: absolute;
+  right: 0; bottom: 0;
+  width: 45%;
+  height: 92%;
+  background: linear-gradient(160deg, #1A100A, #0E0806);
+  clip-path: polygon(100% 0, 100% 100%, 0 100%, 20% 30%);
+  box-shadow: -8px 0 20px rgba(0,0,0,0.5);
+}
+
+/* Texture lines on cliff */
+.art-sea .cliff-right::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    -60deg,
+    transparent 0px,
+    transparent 12px,
+    rgba(255,255,255,0.02) 12px,
+    rgba(255,255,255,0.02) 13px
+  );
+}
+
+.rain-line {
+  position: absolute;
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, rgba(180,210,240,0.3), transparent);
+  animation: rainFall 1.5s linear infinite;
+}
+
+@keyframes rainFall {
+  from { transform: translateY(-60px); opacity: 0; }
+  30%  { opacity: 0.6; }
+  to   { transform: translateY(600px); opacity: 0; }
+}
+
+/* ══════════════════════════════════
+   ART 3 — Lantern Writing
+══════════════════════════════════ */
+.art-lantern {
+  background: radial-gradient(ellipse at 45% 25%, #2A1A06 0%, #180E04 30%, #0A0602 70%, #050301 100%);
+  overflow: hidden;
+}
+
+.lantern-halo {
+  position: absolute;
+  top: 8%; left: 50%;
+  transform: translateX(-50%);
+  width: 180px; height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(255,180,60,0.45) 0%,
+    rgba(255,140,30,0.2) 30%,
+    rgba(200,100,20,0.06) 60%,
+    transparent 80%
+  );
+  animation: haloBreath 3s ease-in-out infinite alternate;
+}
+
+@keyframes haloBreath {
+  from { transform: translateX(-50%) scale(0.9); opacity: 0.8; }
+  to   { transform: translateX(-50%) scale(1.1); opacity: 1; }
+}
+
+/* Lantern object */
+.lantern-obj {
+  position: absolute;
+  top: 6%; left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: lanternSwing 5s ease-in-out infinite alternate;
+  transform-origin: top center;
+}
+
+@keyframes lanternSwing {
+  from { transform: translateX(-50%) rotate(-4deg); }
+  to   { transform: translateX(-50%) rotate(4deg); }
+}
+
+.lantern-hook {
+  width: 2px; height: 20px;
+  background: #6A4A20;
+}
+
+.lantern-cap {
+  width: 34px; height: 8px;
+  background: linear-gradient(to bottom, #8A6A30, #5A4010);
+  border-radius: 2px;
+}
+
+.lantern-glass {
+  width: 28px; height: 42px;
+  background: linear-gradient(to bottom, rgba(255,200,80,0.1), rgba(255,160,40,0.15));
+  border: 2px solid #6A4A20;
+  border-top: none; border-bottom: none;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lantern-flame {
+  width: 10px; height: 16px;
+  background: radial-gradient(ellipse at 50% 80%, #FFF8E0, #FFD060, #FF9020);
+  border-radius: 50% 50% 30% 30%;
+  animation: flameFlicker 0.8s ease-in-out infinite alternate;
+  filter: blur(1px);
+}
+
+@keyframes flameFlicker {
+  from { transform: scaleX(1) scaleY(1) translateY(0); }
+  to   { transform: scaleX(0.8) scaleY(1.15) translateY(-2px); }
+}
+
+.lantern-base {
+  width: 34px; height: 8px;
+  background: linear-gradient(to top, #8A6A30, #5A4010);
+  border-radius: 2px;
+}
+
+/* Desk scene */
+.desk-scene {
+  position: absolute;
+  bottom: 12%;
+  left: 50%; transform: translateX(-50%);
+  width: 180px;
+}
+
+.desk-top {
+  width: 130px; height: 12px;
+  background: linear-gradient(to bottom, #5A3A18, #3A2010);
+  border-radius: 2px;
+  margin: 0 auto;
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+.desk-top::before, .desk-top::after {
+  content: '';
+  position: absolute;
+  bottom: -22px;
+  width: 12px; height: 22px;
+  background: #3A2010;
+  border-radius: 0 0 2px 2px;
+}
+.desk-top::before { left: 12px; }
+.desk-top::after  { right: 12px; }
+
+/* Open notebook */
+.notebook {
+  position: absolute;
+  bottom: 12px;
+  left: 50%; transform: translateX(-50%);
+  width: 80px; height: 58px;
+  background: linear-gradient(to right, #EEE0C0, #F8F0DC);
+  border-radius: 2px;
+  box-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+  overflow: hidden;
+  display: flex;
+}
+
+.notebook-left {
+  flex: 1;
+  border-right: 1.5px solid #C4A870;
+  background: linear-gradient(to right, #E8D8B0, #EEE0C0);
+  padding: 6px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.notebook-right {
+  flex: 1;
+  padding: 6px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.text-line {
+  height: 1.5px;
+  border-radius: 1px;
+  background: rgba(100,70,30,0.2);
+}
+
+.text-line.writing {
+  background: rgba(30,30,80,0.35);
+  animation: writingAnim 2s ease-in-out infinite;
+}
+
+@keyframes writingAnim {
+  0%   { width: 20%; }
+  50%  { width: 90%; }
+  100% { width: 60%; }
+}
+
+/* Inkpot */
+.inkpot {
+  position: absolute;
+  bottom: 10px;
+  right: 24px;
+  width: 14px; height: 14px;
+  background: radial-gradient(circle at 40% 35%, #3A3A5A, #1A1A3A);
+  border-radius: 3px 3px 5px 5px;
+  border-bottom: 2px solid #2A2A4A;
+}
+
+.inkpot::before {
+  content: '';
+  position: absolute;
+  top: -5px; left: 2px;
+  width: 10px; height: 7px;
+  background: #2A2A4A;
+  border-radius: 3px 3px 0 0;
+}
+
+/* ══════════════════════════════════
+   ART 4 — Stars & Cosmos
+══════════════════════════════════ */
+.art-cosmos {
+  background: linear-gradient(160deg, #010208 0%, #04082A 35%, #080E3A 60%, #0A1248 100%);
+  overflow: hidden;
+}
+
+.nebula {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(30px);
+  animation: nebulaFloat 12s ease-in-out infinite alternate;
+}
+
+@keyframes nebulaFloat {
+  from { transform: scale(1) translate(0,0); }
+  to   { transform: scale(1.1) translate(5px,-5px); }
+}
+
+.cosmos-star {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  animation: cosmosGlow 4s ease-in-out infinite alternate;
+}
+
+@keyframes cosmosGlow {
+  from { opacity: 0.3; box-shadow: none; }
+  to   { opacity: 1; box-shadow: 0 0 4px 1px rgba(200,220,255,0.5); }
+}
+
+.shooting-star {
+  position: absolute;
+  height: 2px;
+  background: linear-gradient(to right, transparent, rgba(255,255,220,1), white);
+  border-radius: 1px;
+  animation: shoot 8s linear infinite;
+  filter: blur(0.5px);
+}
+
+@keyframes shoot {
+  0%   { transform: translateX(-200px) translateY(0) rotate(-18deg); opacity: 0; width: 0px; }
+  5%   { opacity: 1; width: 80px; }
+  90%  { opacity: 0.8; }
+  100% { transform: translateX(700px) translateY(80px) rotate(-18deg); opacity: 0; width: 60px; }
+}
+
+.art-cosmos .horizon-cliff {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 32%;
+  background: #06040A;
+  clip-path: polygon(0 48%, 18% 15%, 35% 40%, 52% 8%, 68% 30%, 82% 12%, 100% 28%, 100% 100%, 0 100%);
+}
+
+.art-cosmos .horizon-cliff::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(140,100,200,0.4), transparent);
+}
+
+/* ══════════════════════════════════
+   ART 5 — Books Everywhere
+══════════════════════════════════ */
+.art-books {
+  background: linear-gradient(135deg, #F8F0DC 0%, #EDD8B0 40%, #DEC898 70%, #CCB488 100%);
+  overflow: hidden;
+}
+
+.bg-circles {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.07;
+}
+
+.book3d {
+  position: absolute;
+  display: flex;
+  animation: bookFloat 5s ease-in-out infinite alternate;
+}
+
+@keyframes bookFloat {
+  from { transform: translateY(0) rotate(var(--r, -3deg)); }
+  to   { transform: translateY(-10px) rotate(calc(var(--r, -3deg) * -1)); }
+}
+
+.book3d .bspine {
+  width: 14px;
+  border-radius: 2px 0 0 2px;
+  box-shadow: inset -3px 0 6px rgba(0,0,0,0.2);
+}
+
+.book3d .bcover {
+  border-radius: 0 2px 2px 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  box-shadow: 3px 3px 10px rgba(0,0,0,0.2), 1px 1px 0 rgba(255,255,255,0.3);
+}
+
+.book3d .bline {
+  height: 1.5px;
+  background: rgba(255,255,255,0.4);
+  border-radius: 1px;
+  margin-top: 4px;
+}
+
+.scatter-line {
+  position: absolute;
+  height: 1px;
+  background: rgba(106,42,90,0.12);
+  border-radius: 1px;
+}
+
+.world-dots {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle 2px at 20% 40%, rgba(106,42,90,0.2) 0%, transparent 100%),
+    radial-gradient(circle 3px at 50% 32%, rgba(106,42,90,0.15) 0%, transparent 100%),
+    radial-gradient(circle 2px at 75% 45%, rgba(106,42,90,0.18) 0%, transparent 100%),
+    radial-gradient(circle 2px at 35% 65%, rgba(106,42,90,0.12) 0%, transparent 100%),
+    radial-gradient(circle 2px at 65% 60%, rgba(106,42,90,0.15) 0%, transparent 100%);
+}
+
+/* ══════════════════════════════════
+   ART 6 — Birthday & Triumph
+══════════════════════════════════ */
+.art-birthday {
+  background: linear-gradient(160deg,
+    #08020E 0%,
+    #1A0838 15%,
+    #4A0A4A 32%,
+    #9A3060 50%,
+    #E8602A 68%,
+    #F5A820 82%,
+    #FDE060 92%,
+    #FFF4B0 100%
+  );
+  overflow: hidden;
+}
+
+.confetti-piece {
+  position: absolute;
+  animation: confettiFall 6s linear infinite;
+  border-radius: 2px;
+}
+
+@keyframes confettiFall {
+  0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(600px) rotate(720deg); opacity: 0; }
+}
+
+.burst-ray {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform-origin: 0 0;
+  width: 200px; height: 1px;
+  background: linear-gradient(to right, rgba(255,220,100,0.25), transparent);
+}
+
+.gold-star-big {
+  position: absolute;
+  background: var(--gold);
+  animation: starFloat 4s ease-in-out infinite alternate;
+}
+
+@keyframes starFloat {
+  from { transform: rotate(0deg) scale(0.9); filter: brightness(0.9); }
+  to   { transform: rotate(15deg) scale(1.15); filter: brightness(1.3); }
+}
+
+.art-birthday .final-cliff {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 42%;
+  background: #0A0608;
+  clip-path: polygon(0 52%, 12% 22%, 28% 45%, 44% 10%, 58% 35%, 72% 15%, 88% 38%, 100% 22%, 100% 100%, 0 100%);
+}
+
+/* ─── NAVIGATION ─── */
+.nav-area {
+  position: relative; z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 24px;
+  animation: fadeUp 1s ease 0.6s both;
+}
+
+.nav-btn {
+  width: 54px; height: 54px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(240,192,96,0.35);
+  background: rgba(240,192,96,0.07);
+  color: var(--gold);
+  font-size: 1.4rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+  backdrop-filter: blur(6px);
+  line-height: 1;
+}
+
+.nav-btn:hover:not(:disabled) {
+  background: rgba(240,192,96,0.18);
+  border-color: var(--gold);
+  transform: scale(1.1);
+  box-shadow: 0 0 20px rgba(240,192,96,0.25);
+}
+
+.nav-btn:disabled { opacity: 0.18; cursor: not-allowed; }
+
+.dots-row { display: flex; gap: 8px; align-items: center; }
+
+.dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: rgba(240,192,96,0.2);
+  cursor: pointer;
+  transition: all 0.3s;
+  border: 1px solid rgba(240,192,96,0.3);
+}
+
+.dot.active {
+  background: var(--gold);
+  transform: scale(1.4);
+  box-shadow: 0 0 8px rgba(240,192,96,0.5);
+}
+
+.page-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 0.85rem;
+  color: rgba(253,246,232,0.35);
+  min-width: 80px;
+  text-align: center;
+}
+
+@keyframes fadeSlideDown {
+  from { opacity: 0; transform: translateY(-24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* swipe hint */
+.swipe-hint {
+  text-align: center;
+  margin-top: 14px;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 0.75rem;
+  color: rgba(253,246,232,0.2);
+  letter-spacing: 2px;
+  animation: fadeUp 1s ease 1.2s both;
+}
+
+/* Birthday ribbon top of text panel */
+.birthday-ribbon {
+  position: absolute;
+  top: 12px; right: 20px;
+  font-size: 1.4rem;
+  animation: ribbonBounce 2s ease-in-out infinite alternate;
+}
+
+@keyframes ribbonBounce {
+  from { transform: rotate(-10deg) scale(1); }
+  to   { transform: rotate(10deg) scale(1.15); }
+}
+</style>
+</head>
+<body>
+<div class="confetti-strip"></div>
+
+<div class="book-wrap">
+
+  <!-- HEADER -->
+  <div class="book-header">
+    <div class="birthday-badge">🎂 &nbsp; A Birthday Story &nbsp; 🎂</div>
+    <h1 class="main-title">Zippy<br>&amp; The <em>Edge</em> of Everything</h1>
+    <div class="subtitle-tag">A story of a girl, a cliff, and the whole wide world</div>
+  </div>
+
+  <!-- BOOK -->
+  <div class="book-frame">
+    <div class="book-spine-bar"></div>
+
+    <!-- ══ PAGE 1 ══ -->
+    <div class="page active" id="p0">
+      <div class="page-grid">
+        <div class="art-side art-cover">
+          <!-- Stars -->
+          <div class="cover-star" style="width:3px;height:3px;top:6%;left:12%;animation-delay:0s;"></div>
+          <div class="cover-star" style="width:2px;height:2px;top:11%;left:72%;animation-delay:0.4s;"></div>
+          <div class="cover-star" style="width:3px;height:3px;top:4%;left:52%;animation-delay:0.9s;"></div>
+          <div class="cover-star" style="width:2px;height:2px;top:18%;left:88%;animation-delay:0.6s;"></div>
+          <div class="cover-star" style="width:4px;height:4px;top:8%;left:35%;animation-delay:1.2s;"></div>
+          <div class="cover-star" style="width:2px;height:2px;top:22%;left:62%;animation-delay:1.7s;"></div>
+          <div class="cover-star" style="width:3px;height:3px;top:14%;left:6%;animation-delay:2.1s;"></div>
+          <!-- Moon -->
+          <div class="big-moon"></div>
+          <!-- Cliff -->
+          <div class="cliff-layer cliff-far"></div>
+          <div class="cliff-layer cliff-near"></div>
+          <div class="cliff-layer sea-strip"></div>
+          <!-- Zippy on cliff -->
+          <div class="zippy wind" style="bottom:44%;left:50%;transform:translateX(-50%);">
+            <div class="z-hair"></div>
+            <div class="z-face"></div>
+            <div class="z-neck"></div>
+            <div class="z-body" style="background:#8B3A6B;position:relative;">
+              <div class="z-arms">
+                <div class="z-arm"></div>
+                <div class="z-arm"></div>
+              </div>
+            </div>
+            <div class="z-skirt" style="border-left-width:16px;border-right-width:16px;border-top-width:22px;border-top-color:#6B2A4B;"></div>
+          </div>
+        </div>
+
+        <div class="text-side">
+          <div class="birthday-ribbon">🎀</div>
+          <div class="chapter-tag">✦ Prologue ✦</div>
+          <h2 class="page-title">The Girl on the Edge of the World</h2>
+          <div class="page-body">
+            <p>Her name was <strong>Zippy</strong> — and she lived at the very top of a great grey cliff, where the wind had opinions and the sea told secrets to anyone brave enough to listen.</p>
+            <p>Every morning she stood at the edge, arms stretched wide, and let the ocean breeze decide what the day would bring.</p>
+            <div class="pull-quote">"The cliff doesn't ask if you're ready. It simply shows you how far you can see — and trusts you to look."</div>
+            <p>And what Zippy could see, standing up there in the sky — oh, what she could see — was <em>everything</em>.</p>
+          </div>
+          <div class="page-footer">
+            <span class="footer-ornament">· · ·</span>
+            <span class="page-num">Page I</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PAGE 2 ══ -->
+    <div class="page" id="p1">
+      <div class="page-grid">
+        <div class="art-side art-sea">
+          <!-- Rain -->
+          <div class="rain-line" style="left:15%;height:40%;top:0;animation-delay:0s;"></div>
+          <div class="rain-line" style="left:28%;height:55%;top:0;animation-delay:0.3s;"></div>
+          <div class="rain-line" style="left:42%;height:35%;top:0;animation-delay:0.7s;"></div>
+          <div class="rain-line" style="left:58%;height:60%;top:0;animation-delay:0.1s;"></div>
+          <div class="rain-line" style="left:72%;height:45%;top:0;animation-delay:0.5s;"></div>
+          <div class="rain-line" style="left:85%;height:50%;top:0;animation-delay:0.9s;"></div>
+          <!-- Waves -->
+          <div class="sea-wave" style="bottom:32%;height:70px;background:rgba(30,80,140,0.5);animation-duration:6s;animation-delay:0s;"></div>
+          <div class="sea-wave" style="bottom:22%;height:80px;background:rgba(20,60,110,0.6);animation-duration:7s;animation-delay:1.5s;"></div>
+          <div class="sea-wave" style="bottom:12%;height:90px;background:rgba(15,50,95,0.7);animation-duration:5s;animation-delay:0.8s;"></div>
+          <div class="sea-wave" style="bottom:2%;height:100px;background:rgba(10,40,80,0.8);animation-duration:8s;animation-delay:2s;"></div>
+          <!-- Sparkles on water -->
+          <div class="sea-sparkle" style="bottom:30%;left:20%;animation-delay:0s;"></div>
+          <div class="sea-sparkle" style="bottom:18%;left:55%;animation-delay:0.8s;"></div>
+          <div class="sea-sparkle" style="bottom:8%;left:35%;animation-delay:1.6s;"></div>
+          <!-- Cliff -->
+          <div class="cliff-right"></div>
+          <!-- Zippy reading on cliff edge -->
+          <div class="zippy" style="bottom:64%;right:6%;transform:none;">
+            <div class="z-hair"></div>
+            <div class="z-face"></div>
+            <div class="z-neck"></div>
+            <div class="z-body" style="background:#3A6A5A;width:20px;height:24px;border-radius:2px;">
+            </div>
+            <div style="width:26px;height:16px;background:#F5EDD8;border-radius:1px;border-left:2px solid #C4A870;margin-top:2px;box-shadow:2px 2px 4px rgba(0,0,0,0.3);"></div>
+          </div>
+        </div>
+
+        <div class="text-side">
+          <div class="chapter-tag">〰 Chapter One 〰</div>
+          <h2 class="page-title">The Sea Spoke in Sentences</h2>
+          <div class="page-body">
+            <p>Most people heard only waves. Zippy heard <em>chapters</em>.</p>
+            <p>Each roaring swell was a paragraph, each long slow tide an ellipsis — the ocean pausing to catch its breath before saying something even bigger.</p>
+            <div class="pull-quote">"She pressed her ear to the cliff-stone and wrote down everything the water was whispering."</div>
+            <p>Storm after brilliant storm, she filled notebook after notebook. Nobody below knew a great writer was being born up there, wild-haired and barefoot, listening to the sea.</p>
+          </div>
+          <div class="page-footer">
+            <span class="footer-ornament">· · ·</span>
+            <span class="page-num">Page II</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PAGE 3 ══ -->
+    <div class="page" id="p2">
+      <div class="page-grid">
+        <div class="art-side art-lantern">
+          <div class="lantern-halo"></div>
+          <div class="lantern-obj">
+            <div class="lantern-hook"></div>
+            <div class="lantern-cap"></div>
+            <div class="lantern-glass">
+              <div class="lantern-flame"></div>
+            </div>
+            <div class="lantern-base"></div>
+          </div>
+          <div class="desk-scene">
+            <div class="notebook">
+              <div class="notebook-left">
+                <div class="text-line" style="width:90%"></div>
+                <div class="text-line" style="width:70%"></div>
+                <div class="text-line" style="width:85%"></div>
+                <div class="text-line" style="width:60%"></div>
+                <div class="text-line" style="width:80%"></div>
+                <div class="text-line" style="width:75%"></div>
+              </div>
+              <div class="notebook-right">
+                <div class="text-line writing" style="width:85%"></div>
+                <div class="text-line" style="width:0%"></div>
+                <div class="text-line" style="width:0%"></div>
+                <div class="text-line" style="width:0%"></div>
+                <div class="text-line" style="width:0%"></div>
+              </div>
+            </div>
+            <div class="inkpot"></div>
+            <div class="desk-top"></div>
+          </div>
+          <!-- Zippy at desk -->
+          <div class="zippy" style="bottom:calc(12% + 44px);left:50%;transform:translateX(-50%);">
+            <div class="z-hair"></div>
+            <div class="z-face"></div>
+            <div class="z-neck"></div>
+            <div class="z-body" style="background:#3A5A8A;width:20px;height:22px;border-radius:2px;"></div>
+          </div>
+        </div>
+
+        <div class="text-side">
+          <div class="chapter-tag">✒ Chapter Two ✒</div>
+          <h2 class="page-title">A Lantern and an Empty Page</h2>
+          <div class="page-body">
+            <p>At night, when the cliff turned black and the sea became sound rather than sight, Zippy lit her lantern and wrote.</p>
+            <p>She wrote about loneliness that felt like freedom. About storms that made her braver. About the strange, shimmering silence that exists only at the edge of things.</p>
+            <div class="pull-quote">"The blank page was patient. It held everything she was afraid to say out loud."</div>
+            <p>Her hand moved fast — <em>faster</em> — as though the words might dissolve if she wasn't quick enough to catch them. By morning, another story was born.</p>
+          </div>
+          <div class="page-footer">
+            <span class="footer-ornament">· · ·</span>
+            <span class="page-num">Page III</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PAGE 4 ══ -->
+    <div class="page" id="p3">
+      <div class="page-grid">
+        <div class="art-side art-cosmos">
+          <!-- Nebulae -->
+          <div class="nebula" style="width:160px;height:100px;top:5%;left:-20%;background:radial-gradient(ellipse, rgba(100,40,140,0.5), transparent);animation-delay:0s;"></div>
+          <div class="nebula" style="width:120px;height:80px;top:20%;right:-15%;background:radial-gradient(ellipse, rgba(40,80,160,0.4), transparent);animation-delay:3s;"></div>
+          <div class="nebula" style="width:100px;height:70px;top:45%;left:20%;background:radial-gradient(ellipse, rgba(180,60,100,0.25), transparent);animation-delay:6s;"></div>
+          <!-- Stars -->
+          <div class="cosmos-star" style="width:4px;height:4px;top:10%;left:20%;animation-delay:0s;"></div>
+          <div class="cosmos-star" style="width:5px;height:5px;top:16%;left:70%;animation-delay:0.6s;"></div>
+          <div class="cosmos-star" style="width:3px;height:3px;top:25%;left:42%;animation-delay:1.2s;"></div>
+          <div class="cosmos-star" style="width:4px;height:4px;top:8%;left:55%;animation-delay:1.8s;"></div>
+          <div class="cosmos-star" style="width:3px;height:3px;top:35%;left:80%;animation-delay:0.3s;"></div>
+          <div class="cosmos-star" style="width:5px;height:5px;top:12%;left:8%;animation-delay:2.1s;"></div>
+          <div class="cosmos-star" style="width:3px;height:3px;top:40%;left:28%;animation-delay:0.9s;"></div>
+          <div class="cosmos-star" style="width:4px;height:4px;top:30%;left:60%;animation-delay:1.5s;"></div>
+          <div class="cosmos-star" style="width:2px;height:2px;top:20%;left:90%;animation-delay:0.4s;"></div>
+          <div class="cosmos-star" style="width:3px;height:3px;top:48%;left:50%;animation-delay:2.5s;"></div>
+          <!-- Shooting stars -->
+          <div class="shooting-star" style="top:18%;animation-delay:0s;animation-duration:9s;"></div>
+          <div class="shooting-star" style="top:35%;animation-delay:4s;animation-duration:7s;"></div>
+          <div class="shooting-star" style="top:10%;animation-delay:7s;animation-duration:11s;"></div>
+          <!-- Cliff -->
+          <div class="horizon-cliff"></div>
+          <!-- Zippy star-gazing -->
+          <div class="zippy" style="bottom:30%;left:48%;transform:translateX(-50%);">
+            <div class="z-hair"></div>
+            <div class="z-face"></div>
+            <div class="z-neck"></div>
+            <div class="z-body" style="background:#6B4A8B;width:20px;height:24px;border-radius:2px;"></div>
+            <div class="z-skirt" style="border-left-width:14px;border-right-width:14px;border-top-width:20px;border-top-color:#4B2A6B;"></div>
+          </div>
+        </div>
+
+        <div class="text-side">
+          <div class="chapter-tag">★ Chapter Three ★</div>
+          <h2 class="page-title">The Night She Read the Stars</h2>
+          <div class="page-body">
+            <p>One autumn night, the sky was so clear it felt like a gift laid out just for her. Zippy lay on the cold cliff-stone and read the stars the way she read her books — slowly, hunting for the story between the words.</p>
+            <p>She saw heroes. Monsters. Migrations. All written in light that had been travelling for a thousand years just to reach her eyes.</p>
+            <div class="pull-quote">"Every constellation was a chapter someone ancient had left behind. Zippy decided to add her own."</div>
+            <p>By dawn she had planned her first novel. She would call it <em>At the Edge of the Sky</em>.</p>
+          </div>
+          <div class="page-footer">
+            <span class="footer-ornament">· · ·</span>
+            <span class="page-num">Page IV</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PAGE 5 ══ -->
+    <div class="page" id="p4">
+      <div class="page-grid">
+        <div class="art-side art-books">
+          <div class="world-dots"></div>
+          <div class="bg-circles" style="width:300px;height:300px;bottom:-80px;right:-80px;background:rgba(106,42,90,0.08);"></div>
+          <div class="bg-circles" style="width:200px;height:200px;top:-40px;left:-40px;background:rgba(26,90,106,0.06);"></div>
+
+          <!-- Books scattered like a library explosion -->
+          <div class="book3d" style="bottom:28%;left:4%;--r:-8deg;animation-delay:0s;">
+            <div class="bspine" style="height:100px;background:#C44A20;"></div>
+            <div class="bcover" style="width:60px;height:100px;background:#D45A30;">
+              <div class="bline"></div><div class="bline"></div><div class="bline" style="width:60%;"></div>
+            </div>
+          </div>
+
+          <div class="book3d" style="bottom:28%;left:28%;--r:5deg;animation-delay:0.8s;">
+            <div class="bspine" style="height:120px;background:#2A5A8A;"></div>
+            <div class="bcover" style="width:70px;height:120px;background:#3A6A9A;">
+              <div class="bline"></div><div class="bline"></div><div class="bline" style="width:80%;"></div>
+            </div>
+          </div>
+
+          <div class="book3d" style="bottom:28%;left:54%;--r:-4deg;animation-delay:1.5s;">
+            <div class="bspine" style="height:90px;background:#5A7A3A;"></div>
+            <div class="bcover" style="width:55px;height:90px;background:#6A8A4A;">
+              <div class="bline"></div><div class="bline"></div>
+            </div>
+          </div>
+
+          <div class="book3d" style="bottom:28%;right:4%;--r:6deg;animation-delay:0.4s;">
+            <div class="bspine" style="height:110px;background:#7A3A8A;"></div>
+            <div class="bcover" style="width:64px;height:110px;background:#8A4A9A;">
+              <div class="bline"></div><div class="bline"></div><div class="bline" style="width:70%;"></div>
+            </div>
+          </div>
+
+          <!-- Floating open book top -->
+          <div class="book3d" style="top:8%;left:50%;transform:translateX(-50%) rotate(-6deg);animation-delay:1s;">
+            <div style="width:120px;height:76px;background:linear-gradient(to right,#EEE0C0,#F8F0DC);border-radius:2px;display:flex;box-shadow:4px 4px 16px rgba(0,0,0,0.15);">
+              <div style="flex:1;border-right:2px solid #C4A870;padding:6px;display:flex;flex-direction:column;gap:4px;">
+                <div style="height:2px;background:rgba(80,50,20,0.25);border-radius:1px;"></div>
+                <div style="height:2px;background:rgba(80,50,20,0.2);border-radius:1px;width:80%;"></div>
+                <div style="height:2px;background:rgba(80,50,20,0.25);border-radius:1px;"></div>
+                <div style="height:2px;background:rgba(80,50,20,0.15);border-radius:1px;width:90%;"></div>
+                <div style="height:2px;background:rgba(80,50,20,0.2);border-radius:1px;width:70%;"></div>
+              </div>
+              <div style="flex:1;padding:6px;display:flex;flex-direction:column;gap:4px;">
+                <div style="height:2px;background:rgba(80,50,20,0.2);border-radius:1px;width:85%;"></div>
+                <div style="height:2px;background:rgba(80,50,20,0.25);border-radius:1px;"></div>
+                <div style="height:2px;background:rgba(80,50,20,0.15);border-radius:1px;width:75%;"></div>
+                <div style="height:2px;background:rgba(80,50,20,0.2);border-radius:1px;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Zippy's face peeking from behind books -->
+          <div class="zippy" style="bottom:calc(28% + 110px);left:50%;transform:translateX(-60%);">
+            <div class="z-hair" style="width:28px;"></div>
+            <div class="z-face" style="width:22px;height:22px;"></div>
+          </div>
+        </div>
+
+        <div class="text-side">
+          <div class="chapter-tag">📚 Chapter Four 📚</div>
+          <h2 class="page-title">The Books That Went Everywhere She Didn't</h2>
+          <div class="page-body">
+            <p>One book became two. Two became seven. Seven became too many to count.</p>
+            <p><em>At the Edge of the Sky</em> was read in cities she'd never visited, in languages she'd never learned. Her stories crossed oceans she had only watched from above.</p>
+            <div class="pull-quote">"A girl in Lagos cried over chapter nine. A woman in Seoul kept a copy beside her bed for seven years."</div>
+            <p>Critics called Zippy <em>"a voice from the wild margins."</em></p>
+            <p>She called herself simply: a girl with a notebook and a very good cliff.</p>
+          </div>
+          <div class="page-footer">
+            <span class="footer-ornament">· · ·</span>
+            <span class="page-num">Page V</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PAGE 6 ══ -->
+    <div class="page" id="p5">
+      <div class="page-grid">
+        <div class="art-side art-birthday">
+          <!-- Burst rays -->
+          <div class="burst-ray" style="transform:rotate(0deg);top:35%;left:45%;"></div>
+          <div class="burst-ray" style="transform:rotate(30deg);top:35%;left:45%;"></div>
+          <div class="burst-ray" style="transform:rotate(60deg);top:35%;left:45%;"></div>
+          <div class="burst-ray" style="transform:rotate(90deg);top:35%;left:45%;"></div>
+          <div class="burst-ray" style="transform:rotate(120deg);top:35%;left:45%;"></div>
+          <div class="burst-ray" style="transform:rotate(150deg);top:35%;left:45%;"></div>
+          <div class="burst-ray" style="transform:rotate(180deg);top:35%;left:45%;"></div>
+          <div class="burst-ray" style="transform:rotate(210deg);top:35%;left:45%;"></div>
+          <div class="burst-ray" style="transform:rotate(240deg);top:35%;left:45%;"></div>
+          <div class="burst-ray" style="transform:rotate(270deg);top:35%;left:45%;"></div>
+          <div class="burst-ray" style="transform:rotate(300deg);top:35%;left:45%;"></div>
+          <div class="burst-ray" style="transform:rotate(330deg);top:35%;left:45%;"></div>
+
+          <!-- Confetti -->
+          <div class="confetti-piece" style="width:8px;height:8px;background:#E85A7A;left:10%;animation-delay:0s;animation-duration:5s;border-radius:50%;"></div>
+          <div class="confetti-piece" style="width:6px;height:10px;background:#F0C060;left:25%;animation-delay:1s;animation-duration:6s;"></div>
+          <div class="confetti-piece" style="width:8px;height:6px;background:#6A9ADA;left:40%;animation-delay:2s;animation-duration:4.5s;border-radius:50%;"></div>
+          <div class="confetti-piece" style="width:6px;height:8px;background:#7ACA7A;left:60%;animation-delay:0.5s;animation-duration:7s;"></div>
+          <div class="confetti-piece" style="width:10px;height:6px;background:#E8901A;left:75%;animation-delay:1.5s;animation-duration:5.5s;border-radius:50%;"></div>
+          <div class="confetti-piece" style="width:6px;height:6px;background:#DA7ACA;left:88%;animation-delay:3s;animation-duration:4s;"></div>
+          <div class="confetti-piece" style="width:8px;height:10px;background:#F0C060;left:5%;animation-delay:2.5s;animation-duration:6.5s;border-radius:50%;"></div>
+          <div class="confetti-piece" style="width:6px;height:8px;background:#E85A7A;left:50%;animation-delay:0.8s;animation-duration:5.2s;"></div>
+
+          <!-- Gold stars floating -->
+          <div class="gold-star-big" style="width:18px;height:18px;top:12%;left:15%;animation-delay:0s;clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);"></div>
+          <div class="gold-star-big" style="width:24px;height:24px;top:8%;left:55%;animation-delay:0.7s;clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);"></div>
+          <div class="gold-star-big" style="width:16px;height:16px;top:18%;right:12%;animation-delay:1.4s;clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);"></div>
+          <div class="gold-star-big" style="width:14px;height:14px;top:28%;left:28%;animation-delay:2s;clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);"></div>
+
+          <!-- Cliff -->
+          <div class="final-cliff"></div>
+
+          <!-- Zippy triumphant, arms raised -->
+          <div class="zippy" style="bottom:40%;left:50%;transform:translateX(-50%);">
+            <div class="z-hair"></div>
+            <div class="z-face"></div>
+            <div class="z-neck"></div>
+            <div class="z-body" style="background:#2A6A3A;width:24px;height:30px;border-radius:2px;position:relative;">
+              <!-- Arms raised -->
+              <div style="position:absolute;top:4px;left:-18px;width:18px;height:7px;background:#3D1808;border-radius:4px;transform:rotate(-45deg);transform-origin:right center;"></div>
+              <div style="position:absolute;top:4px;right:-18px;width:18px;height:7px;background:#3D1808;border-radius:4px;transform:rotate(45deg);transform-origin:left center;"></div>
+            </div>
+            <div class="z-skirt" style="border-left-width:18px;border-right-width:18px;border-top-width:24px;border-top-color:#1A4A2A;"></div>
+          </div>
+        </div>
+
+        <div class="text-side">
+          <div class="birthday-ribbon" style="font-size:1.8rem;">🎉</div>
+          <div class="chapter-tag">✦ Epilogue ✦</div>
+          <h2 class="page-title">She Always Came Back to the Edge</h2>
+          <div class="page-body">
+            <p>They gave Zippy awards. Invited her to grand halls with chandeliers. She went sometimes, said thank you, and came home.</p>
+            <p>Home was the cliff. Home was the wind that had known her name long before anyone else did.</p>
+            <div class="pull-quote">"The greatest thing the cliff ever gave her wasn't inspiration. It was the courage to stand at the edge — and not fall."</div>
+            <p>So Zippy lived and wrote and listened and lived some more.</p>
+            <p>And the sea, old and endless, kept telling its stories — <em>grateful, at last, that someone was paying attention.</em></p>
+          </div>
+          <div style="margin-top:18px;font-family:'Playfair Display',serif;font-style:italic;font-size:1rem;color:var(--rose);text-align:center;">
+            🎂 Happy Birthday, Zippy 🎂
+          </div>
+          <div class="page-footer">
+            <span class="footer-ornament">· · · ✦ · · ·</span>
+            <span class="page-num">Fin</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /book-frame -->
+
+  <!-- NAVIGATION -->
+  <div class="nav-area">
+    <button class="nav-btn" id="prev" onclick="go(-1)" disabled>&#8592;</button>
+    <div class="dots-row" id="dots"></div>
+    <button class="nav-btn" id="next" onclick="go(1)">&#8594;</button>
+  </div>
+  <div class="page-label" id="label" style="margin-top:10px;position:relative;z-index:1;text-align:center;"></div>
+  <div class="swipe-hint">Use arrow keys or tap to turn pages</div>
+</div>
+
+<script>
+  const pages = document.querySelectorAll('.page');
+  const labels = ['Prologue','Chapter One','Chapter Two','Chapter Three','Chapter Four','Epilogue'];
+  const dotsEl = document.getElementById('dots');
+  let cur = 0;
+
+  pages.forEach((_,i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i===0?' active':'');
+    d.onclick = () => go(i - cur);
+    dotsEl.appendChild(d);
+  });
+
+  document.getElementById('label').textContent = labels[0];
+
+  function go(dir) {
+    const next = cur + dir;
+    if (next < 0 || next >= pages.length) return;
+    pages[cur].classList.remove('active');
+    dotsEl.children[cur].classList.remove('active');
+    cur = next;
+    pages[cur].classList.add('active');
+    dotsEl.children[cur].classList.add('active');
+    document.getElementById('label').textContent = labels[cur];
+    document.getElementById('prev').disabled = cur === 0;
+    document.getElementById('next').disabled = cur === pages.length - 1;
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') go(1);
+    if (e.key === 'ArrowLeft')  go(-1);
+  });
+
+  // Touch/swipe
+  let startX = 0;
+  document.querySelector('.book-frame').addEventListener('touchstart', e => startX = e.touches[0].clientX);
+  document.querySelector('.book-frame').addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - startX;
+    if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
+  });
+</script>
+</body>
+</html>
